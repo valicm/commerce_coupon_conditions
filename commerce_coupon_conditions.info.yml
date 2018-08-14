@@ -1,0 +1,9 @@
+name: 'Commerce coupon conditions'
+type: module
+description: 'Extends commerce promotion coupon entity with additional conditions'
+core: 8.x
+package: Commerce
+
+dependencies:
+- commerce:commerce
+- commerce:commerce_promotion

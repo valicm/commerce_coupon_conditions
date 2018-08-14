@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Install file for commerce_coupon_conditions.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function commerce_coupon_conditions_install() {
+  $entity_type = \Drupal::service('entity_type.manager')->getDefinition('commerce_promotion_coupon');
+  \Drupal::service('entity.definition_update_manager')->updateEntityType($entity_type);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_coupon_conditions_uninstall() {
+  $entity_type = \Drupal::service('entity_type.manager')->getDefinition('commerce_promotion_coupon');
+  \Drupal::service('entity.definition_update_manager')->updateEntityType($entity_type);
+}
