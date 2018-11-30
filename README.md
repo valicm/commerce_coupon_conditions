@@ -27,7 +27,7 @@ Module is extending Drupal entity commerce_promotion_coupon:
 REQUIREMENTS
 ------------
 
-This module requires Drupal Commerce 2 and it's submodule promotion.
+This module requires Drupal Commerce 2 and its submodule promotion.
 
 
 INSTALLATION
