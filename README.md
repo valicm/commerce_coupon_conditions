@@ -11,7 +11,7 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-This modules is extending Commerce 2 promotion coupon to support
+This module is extending Commerce 2 promotion coupon to support
 commerce conditions plugin in Drupal 8.
 
 Commerce promotion module have conditions, but in some cases is more useful
@@ -21,8 +21,10 @@ and that each coupon has own restrictions.
 It can be more user-friendly & less work for commerce manager
 to create one discount and multiple coupons with restrictions then reverse.
 
-Module is extending Drupal entity commerce_promotion_coupon:
-`Drupal\commerce_promotion\Entity\Coupon`
+Module is extending:
+ * Drupal entity commerce_promotion_coupon: `\Drupal\commerce_coupon_conditions\Entity\Coupon`
+ * Commerce coupon list builder to provide more information: `\Drupal\commerce_coupon_conditions\CouponConditionsListBuilder`
+
 
 REQUIREMENTS
 ------------
