@@ -36,4 +36,5 @@ function commerce_coupon_conditions_help($route_name, RouteMatchInterface $route
  */
 function commerce_coupon_conditions_entity_type_alter(array $entity_types) {
   $entity_types['commerce_promotion_coupon']->setClass('Drupal\commerce_coupon_conditions\Entity\Coupon');
+  $entity_types['commerce_promotion_coupon']->setListBuilderClass('Drupal\commerce_coupon_conditions\CouponConditionsListBuilder');
 }
