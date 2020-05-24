@@ -5,6 +5,8 @@
  * Contains commerce_coupon_conditions.module.
  */
 
+use Drupal\commerce_coupon_conditions\CouponConditionsListBuilder;
+use Drupal\commerce_coupon_conditions\Entity\Coupon;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -14,18 +16,17 @@ function commerce_coupon_conditions_help($route_name, RouteMatchInterface $route
   switch ($route_name) {
     // Main module help for the commerce_coupon_conditions module.
     case 'help.page.commerce_coupon_conditions':
-      $text = file_get_contents(dirname(__FILE__) . '/README.md');
+      $text = file_get_contents(__DIR__ . '/README.md');
       if (!\Drupal::moduleHandler()->moduleExists('markdown')) {
         return '<pre>' . $text . '</pre>';
       }
-      else {
-        // Use the Markdown filter to render the README.
-        $filter_manager = \Drupal::service('plugin.manager.filter');
-        $settings = \Drupal::configFactory()->get('markdown.settings')->getRawData();
-        $config = ['settings' => $settings];
-        $filter = $filter_manager->createInstance('markdown', $config);
-        return $filter->process($text, 'en');
-      }
+
+      // Use the Markdown filter to render the README.
+      $filter_manager = \Drupal::service('plugin.manager.filter');
+      $settings = \Drupal::configFactory()->get('markdown.settings')->getRawData();
+      $config = ['settings' => $settings];
+      $filter = $filter_manager->createInstance('markdown', $config);
+      return $filter->process($text, 'en');
 
     default:
   }
@@ -35,6 +36,6 @@ function commerce_coupon_conditions_help($route_name, RouteMatchInterface $route
  * Implements hook_entity_type_alter().
  */
 function commerce_coupon_conditions_entity_type_alter(array $entity_types) {
-  $entity_types['commerce_promotion_coupon']->setClass('Drupal\commerce_coupon_conditions\Entity\Coupon');
-  $entity_types['commerce_promotion_coupon']->setListBuilderClass('Drupal\commerce_coupon_conditions\CouponConditionsListBuilder');
+  $entity_types['commerce_promotion_coupon']->setClass(Coupon::class);
+  $entity_types['commerce_promotion_coupon']->setListBuilderClass(CouponConditionsListBuilder::class);
 }
