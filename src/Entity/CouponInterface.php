@@ -48,42 +48,6 @@ interface CouponInterface extends CommerceCouponInterface {
   public function setConditionOperator($condition_operator);
 
   /**
-   * Gets the promotion start date.
-   *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The promotion start date.
-   */
-  public function getStartDate();
-
-  /**
-   * Sets the promotion start date.
-   *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
-   *   The promotion start date.
-   *
-   * @return $this
-   */
-  public function setStartDate(DrupalDateTime $start_date);
-
-  /**
-   * Gets the promotion end date.
-   *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The promotion end date.
-   */
-  public function getEndDate();
-
-  /**
-   * Sets the promotion end date.
-   *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
-   *   The promotion end date.
-   *
-   * @return $this
-   */
-  public function setEndDate(DrupalDateTime $end_date = NULL);
-
-  /**
    * Checks whether the coupon can be applied to the given order.
    *
    * Ensures that the promotion is compatible with other

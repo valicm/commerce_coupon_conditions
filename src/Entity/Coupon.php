@@ -68,40 +68,6 @@ class Coupon extends CommerceCoupon implements CouponInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStartDate() {
-    if (!$this->get('start_date')->isEmpty()) {
-      return new DrupalDateTime($this->get('start_date')->value);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setStartDate(DrupalDateTime $start_date) {
-    $this->get('start_date')->value = $start_date->format('Y-m-d');
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEndDate() {
-    if (!$this->get('end_date')->isEmpty()) {
-      return new DrupalDateTime($this->get('end_date')->value);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEndDate(DrupalDateTime $end_date = NULL) {
-    $this->get('end_date')->value = $end_date ? $end_date->format('Y-m-d') : NULL;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function available(OrderInterface $order) {
     // Some defaults from entity.
     // @see Drupal\commerce_coupon\Entity\Coupon.

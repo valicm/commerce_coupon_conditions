@@ -5,5 +5,5 @@ core_version_requirement: ^8 || ^9
 package: Commerce
 
 dependencies:
-- commerce:commerce
+- commerce:commerce (>=8.x-2.28)
 - commerce:commerce_promotion
