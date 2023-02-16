@@ -8,7 +8,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\commerce\ConditionGroup;
 
 /**
@@ -69,46 +68,14 @@ class Coupon extends CommerceCoupon implements CouponInterface {
    * {@inheritdoc}
    */
   public function available(OrderInterface $order) {
-    // Some defaults from entity.
-    // @see Drupal\commerce_coupon\Entity\Coupon.
-    if (!$this->isEnabled()) {
-      return FALSE;
-    }
-    if (!$this->getPromotion()->available($order)) {
-      return FALSE;
+    $available = parent::available($order);
+
+    // If parent returns TRUE, check conditions
+    if ($available) {
+      return $this->applies($order);
     }
 
-    // Check coupon dates.
-    $time = \Drupal::time()->getRequestTime();
-    $start_date = $this->getStartDate();
-    if ($start_date && $start_date->format('U') > $time) {
-      return FALSE;
-    }
-    $end_date = $this->getEndDate();
-    if ($end_date && $end_date->format('U') <= $time) {
-      return FALSE;
-    }
-
-    // Run conditions check here.
-    // It's used on applying coupons to check if they are valid,
-    // but also cover existing coupons which are already assigned on the order
-    // \Drupal\commerce_promotion\PromotionOrderProcessor::process is running
-    // this check.
-    if (!$this->applies($order)) {
-      return FALSE;
-    }
-
-    // Check usage limits and the end.
-    // We load coupon only if all conditions before had been passed.
-    if ($usage_limit = $this->getUsageLimit()) {
-      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
-      $usage = \Drupal::service('commerce_promotion.usage');
-      if ($usage_limit <= $usage->loadByCoupon($this)) {
-        return FALSE;
-      }
-    }
-
-    return TRUE;
+    return FALSE;
   }
 
   /**
@@ -164,26 +131,6 @@ class Coupon extends CommerceCoupon implements CouponInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDefaultValue('AND');
-
-    $fields['start_date'] = BaseFieldDefinition::create('datetime')
-      ->setLabel(t('Start date'))
-      ->setDescription(t('The date the promotion becomes valid.'))
-      ->setRequired(FALSE)
-      ->setSetting('datetime_type', 'date')
-      ->setDisplayOptions('form', [
-        'type' => 'datetime_default',
-        'weight' => 8,
-      ]);
-
-    $fields['end_date'] = BaseFieldDefinition::create('datetime')
-      ->setLabel(t('End date'))
-      ->setDescription(t('The date after which the promotion is invalid.'))
-      ->setRequired(FALSE)
-      ->setSetting('datetime_type', 'date')
-      ->setDisplayOptions('form', [
-        'type' => 'commerce_end_date',
-        'weight' => 9,
-      ]);
 
     return $fields;
   }
