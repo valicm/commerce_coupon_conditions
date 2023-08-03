@@ -41,28 +41,6 @@ function commerce_coupon_conditions_install() {
     ->setDisplayConfigurable('form', TRUE)
     ->setDefaultValue('AND');
   $entity_definition_update->installFieldStorageDefinition('condition_operator', 'commerce_promotion_coupon', 'commerce_coupon_conditions', $storage_definition);
-
-  $storage_definition = BaseFieldDefinition::create('datetime')
-    ->setLabel(t('Start date'))
-    ->setDescription(t('The date the promotion becomes valid.'))
-    ->setRequired(FALSE)
-    ->setSetting('datetime_type', 'date')
-    ->setDisplayOptions('form', [
-      'type' => 'datetime_default',
-      'weight' => 8,
-    ]);
-  $entity_definition_update->installFieldStorageDefinition('start_date', 'commerce_promotion_coupon', 'commerce_coupon_conditions', $storage_definition);
-
-  $storage_definition = BaseFieldDefinition::create('datetime')
-    ->setLabel(t('End date'))
-    ->setDescription(t('The date after which the promotion is invalid.'))
-    ->setRequired(FALSE)
-    ->setSetting('datetime_type', 'date')
-    ->setDisplayOptions('form', [
-      'type' => 'commerce_end_date',
-      'weight' => 9,
-    ]);
-  $entity_definition_update->installFieldStorageDefinition('end_date', 'commerce_promotion_coupon', 'commerce_coupon_conditions', $storage_definition);
 }
 
 /**
@@ -76,14 +54,6 @@ function commerce_coupon_conditions_uninstall() {
   }
 
   if ($storage_definition = $entity_definition_update->getFieldStorageDefinition('condition_operator', 'commerce_promotion_coupon')) {
-    $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
-  }
-
-  if ($storage_definition = $entity_definition_update->getFieldStorageDefinition('start_date', 'commerce_promotion_coupon')) {
-    $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
-  }
-
-  if ($storage_definition = $entity_definition_update->getFieldStorageDefinition('end_date', 'commerce_promotion_coupon')) {
     $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
   }
 }
