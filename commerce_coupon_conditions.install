@@ -5,7 +5,11 @@
  * Install file for commerce_coupon_conditions.
  */
 
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\UpdateException;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Implements hook_install().
@@ -56,4 +60,176 @@ function commerce_coupon_conditions_uninstall() {
   if ($storage_definition = $entity_definition_update->getFieldStorageDefinition('condition_operator', 'commerce_promotion_coupon')) {
     $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
   }
+}
+
+/**
+ * Update Coupon Start and End Date values to parent entity format as needed.
+ */
+function commerce_coupon_conditions_update_8101(&$sandbox) {
+  // Set the batch size for processing.
+  $batch_size = 100;
+
+  if (!isset($sandbox['progress'])) {
+    // Before first run, the caches must have been flushed so that the base
+    // fields for Coupon start/end dates now use the parent definition.
+    $base_fields = \Drupal::service('entity_field.manager')
+      ->getBaseFieldDefinitions('commerce_promotion_coupon');
+
+    // Get the total count of entities to be processed.
+    $query = \Drupal::entityQuery('commerce_promotion_coupon');
+    $or_condition = $query->orConditionGroup()
+      ->condition('start_date', NULL, 'IS NOT NULL')
+      ->condition('end_date', NULL, 'IS NOT NULL');
+    $query->condition($or_condition)
+      ->count();
+    $total_count = $query->execute();
+
+    $sandbox['current_count'] = 0;
+    $sandbox['progress'] = 0;
+    $sandbox['max'] = $total_count;
+    $sandbox['report'] = [
+      'updated' => 0,
+      'skipped' => 0,
+    ];
+  }
+
+  // Query the entities with the date field and process them in batches.
+  $query = \Drupal::entityQuery('commerce_promotion_coupon');
+  $or_condition = $query->orConditionGroup()
+    ->condition('start_date', NULL, 'IS NOT NULL')
+    ->condition('end_date', NULL, 'IS NOT NULL');
+  $query->condition($or_condition)
+    ->range($sandbox['progress'], $batch_size)
+    ->sort('promotion_id', 'ASC')
+    ->sort('id', 'ASC');
+  $result = $query->execute();
+
+  // Fields and their times to append.
+  $target_fields = [
+    'start_date' => '_commerce_coupon_conditions_set_start_date_time',
+    'end_date' => '_commerce_coupon_conditions_set_end_date_time',
+  ];
+
+  // Allow some other module to change the functions.
+  \Drupal::moduleHandler()->alter(
+    'commerce_coupon_conditions_update_8101',
+    $target_fields
+  );
+
+  // Validate those functions exists in effort to avoid hard errors. The two
+  // field names must also still exist.
+  foreach (['start_date', 'end_date'] as $fieldname) {
+    // The needed field must still exist in the array after alter call.
+    if (!isset($target_fields[$fieldname])) {
+      throw new UpdateException('Target field removed: ' . $fieldname);
+    }
+
+    // Callable must exist.
+    $time_function = $target_fields[$fieldname];
+    if (!function_exists($time_function)) {
+      throw new UpdateException('Function does not exists: ' . $time_function);
+    }
+  }
+
+  // Old format used by this module is YYYY-MM-DD, new format includes HH:MM:SS.
+  if (!empty($result)) {
+    $coupons = \Drupal::entityTypeManager()
+      ->getStorage('commerce_promotion_coupon')
+      ->loadMultiple($result);
+
+    foreach ($coupons as $coupon) {
+      // Flag if this entity should be saved.
+      $save_coupon = FALSE;
+
+      // Process both the start_date and end_date fields.
+      foreach ($target_fields as $fieldname => $time_function) {
+        // Get the current date value.
+        $current_value = $coupon->get($fieldname)->getValue();
+        if (empty($current_value)) {
+          continue;
+        }
+        $current_value = $current_value[0]['value'];
+
+        // Only process those fields which are missing the "T" of the time.
+        if (strpos($current_value, 'T') !== FALSE) {
+          continue;
+        }
+
+        // Convert the date to a DateTime object. How does this treat the
+        // timezone? Should we be using the default store timezone?
+        $datetime = new \DateTime($current_value);
+
+        // Add the time using callable which can be overriden if needed.
+        if ($time_function($datetime)) {
+          // Set the new value on the coupon.
+          $coupon->set(
+            $fieldname,
+            $datetime->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)
+          );
+
+          $save_coupon = TRUE;
+        }
+      }
+
+      $sandbox['current_count']++;
+
+      // This needs to be set only if the value is updated.
+      if ($save_coupon) {
+        $sandbox['report']['updated']++;
+        $coupon->save();
+      }
+      else {
+        $sandbox['report']['skipped']++;
+      }
+    }
+
+    // Update the batch progress.
+    $sandbox['progress'] += $batch_size;
+    $sandbox['#finished'] = $sandbox['current_count'] / $sandbox['max'];
+  }
+
+  // Provide batch information to be displayed.
+  if ($sandbox['#finished'] !== 1) {
+    return new TranslatableMarkup(
+      'Processing coupons: @current out of @total', [
+        '@current' => $sandbox['current_count'],
+        '@total' => $sandbox['max'],
+      ]
+    );
+  }
+
+  // Batch job finished.
+  return new TranslatableMarkup(
+    'Converted @updated of @total coupons. @skipped did not need changes.', [
+      '@updated' => $sandbox['report']['updated'],
+      '@skipped' => $sandbox['report']['skipped'],
+      '@total' => $sandbox['max'],
+    ]
+  );
+}
+
+/**
+ * Overrideable callback to set the start date for update_8101.
+ *
+ * To override, implement hook_commerce_coupon_conditions_update_8101_alter and
+ * set the callable function for start_date.
+ */
+function _commerce_coupon_conditions_set_start_date_time(\DateTime &$input) {
+  // This uses the site's default timezone.
+  $input->setTime(0, 0, 0);
+
+  return TRUE;
+}
+
+/**
+ * Overrideable callback to set the end date for update_8101.
+ *
+ * To override, implement hook_commerce_coupon_conditions_update_8101_alter and
+ * set the callable function for end_date.
+ */
+function _commerce_coupon_conditions_set_end_date_time(\DateTime &$input) {
+  // This uses the site's default timezone.
+  $input->setTime(23, 59, 59);
+
+  return TRUE;
 }
