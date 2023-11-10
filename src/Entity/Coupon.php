@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_coupon_conditions\Entity;
 
-use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_promotion\Entity\Coupon as CommerceCoupon;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
-use Drupal\commerce\ConditionGroup;
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_promotion\Entity\Coupon as CommerceCoupon;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Class Coupon.
@@ -70,7 +70,7 @@ class Coupon extends CommerceCoupon implements CouponInterface {
   public function available(OrderInterface $order) {
     $available = parent::available($order);
 
-    // If parent returns TRUE, check conditions
+    // If parent returns TRUE, check conditions.
     if ($available) {
       return $this->applies($order);
     }

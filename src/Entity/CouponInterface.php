@@ -2,9 +2,8 @@
 
 namespace Drupal\commerce_coupon_conditions\Entity;
 
-use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\commerce_promotion\Entity\CouponInterface as CommerceCouponInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_promotion\Entity\CouponInterface as CommerceCouponInterface;
 
 /**
  * Provides an interface for defining coupon entities.
