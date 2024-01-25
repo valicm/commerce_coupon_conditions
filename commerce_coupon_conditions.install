@@ -79,6 +79,7 @@ function commerce_coupon_conditions_update_8101(&$sandbox) {
 
       // Get the total count of entities to be processed.
       $query = \Drupal::entityQuery('commerce_promotion_coupon');
+      $query->accessCheck(FALSE);
       $or_condition = $query->orConditionGroup()
         ->condition('start_date', NULL, 'IS NOT NULL')
         ->condition('end_date', NULL, 'IS NOT NULL');
@@ -97,6 +98,7 @@ function commerce_coupon_conditions_update_8101(&$sandbox) {
 
     // Query the entities with the date field and process them in batches.
     $query = \Drupal::entityQuery('commerce_promotion_coupon');
+    $query->accessCheck(FALSE);
     $or_condition = $query->orConditionGroup()
       ->condition('start_date', NULL, 'IS NOT NULL')
       ->condition('end_date', NULL, 'IS NOT NULL');
