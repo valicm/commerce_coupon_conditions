@@ -1,0 +1,11 @@
+{
+  "name": "drupal/commerce_coupon_conditions",
+  "type": "drupal-module",
+  "description": "Commerce Core promotion coupon support for commerce conditions plugin",
+  "homepage": "https://drupal.org/project/commerce_coupon_conditions",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/commerce": "^2.4 || ^3"
+  }
+}

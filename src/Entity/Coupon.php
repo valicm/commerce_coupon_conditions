@@ -2,16 +2,16 @@
 
 namespace Drupal\commerce_coupon_conditions\Entity;
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Entity\Coupon as CommerceCoupon;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Class Coupon.
+ * Class Coupon defines a class for coupon conditions.
  *
  * @package Drupal\commerce_coupon_conditions\Entity
  */

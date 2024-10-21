@@ -5,8 +5,8 @@
  * Contains commerce_coupon_conditions.module.
  */
 
-use Drupal\commerce_coupon_conditions\Entity\Coupon;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\commerce_coupon_conditions\Entity\Coupon;
 
 /**
  * Implements hook_help().

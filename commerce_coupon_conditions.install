@@ -135,7 +135,7 @@ function commerce_coupon_conditions_update_8101(&$sandbox) {
       }
     }
 
-    // Old format used by this module is YYYY-MM-DD, new format includes HH:MM:SS.
+    // Old format used is YYYY-MM-DD, new format includes HH:MM:SS.
     if (!empty($result)) {
       $coupons = \Drupal::entityTypeManager()
         ->getStorage('commerce_promotion_coupon')
@@ -163,7 +163,7 @@ function commerce_coupon_conditions_update_8101(&$sandbox) {
           // timezone? Should we be using the default store timezone?
           $datetime = new \DateTime($current_value);
 
-          // Add the time using callable which can be overriden if needed.
+          // Add the time using callable which can be overridden if needed.
           if ($time_function($datetime)) {
             // Set the new value on the coupon.
             $coupon->set(
@@ -214,7 +214,7 @@ function commerce_coupon_conditions_update_8101(&$sandbox) {
 }
 
 /**
- * Overrideable callback to set the start date for update_8101.
+ * Overridable callback to set the start date for update_8101.
  *
  * To override, implement hook_commerce_coupon_conditions_update_8101_alter and
  * set the callable function for start_date.
@@ -227,7 +227,7 @@ function _commerce_coupon_conditions_set_start_date_time(\DateTime &$input) {
 }
 
 /**
- * Overrideable callback to set the end date for update_8101.
+ * Overridable callback to set the end date for update_8101.
  *
  * To override, implement hook_commerce_coupon_conditions_update_8101_alter and
  * set the callable function for end_date.
